@@ -87,10 +87,15 @@ RCT_EXPORT_METHOD(GridView:(NSDictionary *)props callback:(RCTResponseSenderBloc
         int height = [[icon objectForKey: @"height"] intValue];
         NSString *imagePath = [icon objectForKey: @"uri"];
         
-        NSURL *url = [NSURL URLWithString: imagePath];
         NSData *data = [NSData dataWithContentsOfURL:url];
 
-        UIImage *image = [[UIImage alloc] initWithCIImage: [CIImage imageWithData: data]];
+        UIImage *image;
+        if ([imagePath hasPrefix:@"data:"] || [imagePath hasPrefix:@"file:"] || [imagePath hasPrefix:@"http:"]) {
+            NSURL *imageUrl = [[NSURL alloc] initWithString:imagePath];
+            image = [UIImage imageWithData:[NSData dataWithContentsOfURL:imageUrl]];
+        } else {
+            image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+        }
 
         // Resize Image
 //        CGSize size = CGSizeMake(width, height);
